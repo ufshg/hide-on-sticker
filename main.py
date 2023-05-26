@@ -53,9 +53,10 @@ def draw_rectangle(event, x, y, flags, param):
     if event == cv.EVENT_LBUTTONDOWN:
         click = True
         x1, y1 = x, y
-    elif event == cv.EVENT_MOUSEMOVE:
-        if click:
-            pass
+    elif event == cv.EVENT_LBUTTONUP:
+        click = False
+        cv.rectangle(temp, (x1, y1), (x, y), (0, 0, 255), 2)
+            
 
 # 얼굴 검출기 초기화
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
@@ -67,14 +68,14 @@ faces = face_cascade.detectMultiScale(gray, 1.03, 5)
 
 # 검출된 얼굴들을 활성 상태로 check에 추가
 for x, y, w, h in faces:
-    check[(x, y, w, h)] = False
+    check[(x, y, w, h)] = True
 
+
+######################################################
+# 1 단계 - 검출된 얼굴 중 지울 것들을 선택
 cv.namedWindow('image')
 cv.setMouseCallback('image', click_rectangle)
 
-######################################################
-
-# 1 단계 - 검출된 얼굴 중 지울 것들을 선택
 while True:
     cv.imshow('image', show_rectangle1(img, faces))
 
@@ -103,11 +104,15 @@ while task:
     faces = np.delete(faces, i, axis=0)
 
 ######################################################
-
 # 2 단계 - 사용자 정의 사각형 그리기
+cv.namedWindow('image')
+cv.setMouseCallback('image', draw_rectangle)
+
+temp = show_rectangle2(img, faces)
+
 # 원본 이미지는 변함 없음을 보여줌
 while True:
-    cv.imshow('image', show_rectangle2(img, faces))
+    cv.imshow('image', temp)
 
     key = cv.waitKey(1) & 0xFF
 
