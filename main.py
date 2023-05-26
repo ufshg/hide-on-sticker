@@ -9,7 +9,7 @@ x1, y1 = -1, -1
 check = dict()
 
 # 원본 이미지를 복사하여 가공한 후 결과를 반환
-def show_rectangle(img, faces):
+def show_rectangle1(img, faces):
     temp = img.copy()
     for x, y, w, h in faces:
         if check[(x, y, w, h)]:
@@ -20,6 +20,14 @@ def show_rectangle(img, faces):
             cv.line(temp, (x, y + h), (x + w, y), (0, 0, 255), 2)
         else:
             cv.rectangle(temp, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    return temp
+
+# 1단계 이후 직사각형을 보여줌
+def show_rectangle2(img, faces):
+    temp = img.copy()
+    for x, y, w, h in faces:
+        cv.rectangle(temp, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
     return temp
 
 # 1 단계에서 사각형을 클릭했을 때 처리하는 함수
@@ -64,8 +72,11 @@ for x, y, w, h in faces:
 cv.namedWindow('image')
 cv.setMouseCallback('image', click_rectangle)
 
+######################################################
+
+# 1 단계 - 검출된 얼굴 중 지울 것들을 선택
 while True:
-    cv.imshow('image', show_rectangle(img, faces))
+    cv.imshow('image', show_rectangle1(img, faces))
 
     key = cv.waitKey(1) & 0xFF
 
@@ -74,9 +85,29 @@ while True:
 
 cv.destroyAllWindows()
 
+# 선택하지 않은 얼굴 제거
+task = []
+
+# 처음부터 순차로 탐색
+for i in range(len(faces)):
+    x, y, w, h = faces[i]
+
+    if not check[(x, y, w, h)]:
+        task.append(i)
+        del check[(x, y, w, h)]
+
+# 역순으로 끝에 있는 것부터 삭제
+# 앞에서부터 지우면 인덱스 오류 예상
+while task:
+    i = task.pop()
+    faces = np.delete(faces, i, axis=0)
+
+######################################################
+
+# 2 단계 - 사용자 정의 사각형 그리기
 # 원본 이미지는 변함 없음을 보여줌
 while True:
-    cv.imshow('image2', img)
+    cv.imshow('image', show_rectangle2(img, faces))
 
     key = cv.waitKey(1) & 0xFF
 
