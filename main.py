@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
-import math
+import os
+import random as r
 
 # 마우스 이벤트에 사용할 변수
 click = False
@@ -43,7 +44,7 @@ def click_rectangle(event, x, y, flags, param):
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
 
 # 이미지 불러오기
-img = cv.imread("sample1.png")
+img = cv.imread("resource/resource_sample1.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 faces = face_cascade.detectMultiScale(gray, 1.03, 5)
 
@@ -162,7 +163,7 @@ cv.namedWindow('image',flags=cv.WINDOW_NORMAL)
 image_height, image_width = img.shape[:2]
 
 # 모자이크 크기 계산
-mosaic_ratio = 0.05  # 모자이크 비율 (0.01 ~ 0.05 사이의 값을 사용)
+mosaic_ratio = 0.08  # 모자이크 비율 (0.01 ~ 0.05 사이의 값을 사용)
 mosaic_size = int(min(image_height, image_width) * mosaic_ratio)
 
 # 모자이크 처리 함수
@@ -183,71 +184,108 @@ def make_mosaic(img):
         temp[y:y+h, x:x+w] = mosaic
     return temp
 
-def put_sticker(img, sticker):
+def put_sticker(img, sticker = None, rand = False):
     temp = img.copy()
-    for (x, y, w, h) in face_result:
-        x -= 8
-        y -= 8
-        w += 16
-        h += 16
-        
-        # 영역 범위 밖 예외처리
-        try:
-            # 얼굴 인식된 영역 크기에 맞게 스티커 크기 조절
-            resized_sticker = cv.resize(sticker, (w, h))
 
-            # 스티커 합성
-            overlay_alpha = resized_sticker[:, :, 3:4] / 255.0
-            background_alpha = 1.0 - overlay_alpha
+    if not rand:
+        for (x, y, w, h) in face_result:
+            x -= 8
+            y -= 8
+            w += 16
+            h += 16
+            
+            # 영역 범위 밖 예외처리
+            try:
+                # 얼굴 인식된 영역 크기에 맞게 스티커 크기 조절
+                resized_sticker = cv.resize(sticker, (w, h))
 
-            # 스티커를 기존 이미지에 덧씌우기
-            temp[y:y+h, x:x+w] = overlay_alpha * resized_sticker[:, :, :3] + background_alpha * temp[y:y+h, x:x+w]
-        except:
-            pass
-        
-    return temp
+                # 스티커 합성
+                overlay_alpha = resized_sticker[:, :, 3:4] / 255.0
+                background_alpha = 1.0 - overlay_alpha
+
+                # 스티커를 기존 이미지에 덧씌우기
+                temp[y:y+h, x:x+w] = overlay_alpha * resized_sticker[:, :, :3] + background_alpha * temp[y:y+h, x:x+w]
+            except:
+                pass
+            
+        return temp
+    else:
+        for (x, y, w, h) in face_result:
+            sticker = cv.imread(path_s + f'/{r.randint(1, sticker_len)}.png', cv.IMREAD_UNCHANGED)
+
+            x -= 8
+            y -= 8
+            w += 16
+            h += 16
+            
+            # 영역 범위 밖 예외처리
+            try:
+                # 얼굴 인식된 영역 크기에 맞게 스티커 크기 조절
+                resized_sticker = cv.resize(sticker, (w, h))
+
+                # 스티커 합성
+                overlay_alpha = resized_sticker[:, :, 3:4] / 255.0
+                background_alpha = 1.0 - overlay_alpha
+
+                # 스티커를 기존 이미지에 덧씌우기
+                temp[y:y+h, x:x+w] = overlay_alpha * resized_sticker[:, :, :3] + background_alpha * temp[y:y+h, x:x+w]
+            except:
+                pass
+            
+        return temp
+
 
 def show_result(img, key):
     if key == 48: # 숫자키 0 -> 원본 복구
         return img
     elif key == 49: # 숫자키 1 -> 모자이크
         return make_mosaic(img)
-    elif key == 50: # 숫자키 2 -> 스티커 1 적용
-        sticker = cv.imread('./sticker/1.png', cv.IMREAD_UNCHANGED)
-        return put_sticker(img, sticker)
-    elif key == 51: # 숫자키 3 -> 스티커 2 적용
-        sticker = cv.imread('./sticker/2.png', cv.IMREAD_UNCHANGED)
-        return put_sticker(img, sticker)
-    elif key == 52: # 숫자키 4 -> 스티커 3 적용
-        sticker = cv.imread('./sticker/3.png', cv.IMREAD_UNCHANGED)
-        return put_sticker(img, sticker)
-    elif key == 53: # 숫자키 5 -> 스티커 4 적용
-        sticker = cv.imread('./sticker/4.png', cv.IMREAD_UNCHANGED)
-        return put_sticker(img, sticker)
-    elif key == 54: # 숫자키 6 -> 스티커 5 적용
-        sticker = cv.imread('./sticker/5.png', cv.IMREAD_UNCHANGED)
-        return put_sticker(img, sticker)
-    elif key == 55: # 숫자키 7 -> 스티커 6 적용
-        sticker = cv.imread('./sticker/6.png', cv.IMREAD_UNCHANGED)
-        return put_sticker(img, sticker)
-    elif key == 56: # 숫자키 8 -> 스티커 7 적용
-        sticker = cv.imread('./sticker/7.png', cv.IMREAD_UNCHANGED)
-        return put_sticker(img, sticker)
-    elif key == 57: # 숫자키 9 -> 모든 스티커 랜덤 적용
-        pass
+    elif 50 <= key <= 56:
+        sticker = cv.imread(f'./sticker/{key - 49}.png', cv.IMREAD_UNCHANGED)
+        return put_sticker(img=img, sticker=sticker)
+    elif key == 57:
+        sticker = cv.imread(path_s + f'/{r.randint(1, sticker_len)}.png', cv.IMREAD_UNCHANGED)
+        return put_sticker(img=img, rand=True)
+
+    #elif key == 57: 
+        # 숫자키 9 -> 모든 스티커 랜덤 적용
+     #   pass
+
+key_index = 49
 key = 49
+
+# 스티커 파일의 경로
+path_s = "./sticker"
+# 스티커 파일 개수
+sticker_len = len(os.listdir(path_s))
+
+# 결과 파일 저장 경로
+path_r = './result/'
+files = os.listdir(path_r)
+result_list = [file for file in files if file.endswith('.png')]
+
+print(result_list)
+
+if result_list:
+    result_index = len(result_list) + 1
+else:
+    result_index = 1
     
 while True:
-    cv.imshow('image',show_result(img, key))
+    temp = show_result(img, key_index)
+    cv.imshow('image', temp)
 
     key = cv.waitKey(0) & 0xFF
 
-    if key == 13: # s키, S키 : 편집한 이미지 저장
-        cv.imwrite('edited'  + '.png',img)
+    if 48 <= key <= 57:
+        key_index = key
+
+    if key == 13: # enter : 편집한 이미지 저장 후 종료
+        cv.imwrite(path_r  + str(result_index).zfill(3) + '.png', temp)
         break
     elif key in (115, 83): # s키, S키 : 편집한 이미지 저장
-        cv.imwrite('edited'  + '.png',img)
-        break
+        cv.imwrite(path_r  + str(result_index).zfill(3) + '.png', temp)
+        result_index += 1
     elif key == 27:
         exit(0)
 
