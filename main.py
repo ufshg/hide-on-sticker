@@ -44,7 +44,7 @@ def click_rectangle(event, x, y, flags, param):
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
 
 # 이미지 불러오기
-img = cv.imread("resource/resource_sample1.png")
+img = cv.imread("resource/resource.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 faces = face_cascade.detectMultiScale(gray, 1.03, 5)
 
@@ -55,11 +55,11 @@ for x, y, w, h in faces:
 
 ######################################################
 # 1 단계 - 검출된 얼굴 중 지울 것들을 선택
-cv.namedWindow('image',flags=cv.WINDOW_NORMAL)
-cv.setMouseCallback('image', click_rectangle)
+cv.namedWindow('hide on sticker',flags=cv.WINDOW_NORMAL)
+cv.setMouseCallback('hide on sticker', click_rectangle)
 
 while True:
-    cv.imshow('image', show_rectangle1(img, faces))
+    cv.imshow('hide on sticker', show_rectangle1(img, faces))
 
     key = cv.waitKey(1) & 0xFF
 
@@ -122,20 +122,18 @@ def draw_rectangle(event, x, y, flags, param):
         stack.append(box)
         
     elif event == cv.EVENT_RBUTTONDOWN:
-        print('hi')
         if stack:
-            print(stack)
             stack.pop()
 
 stack = []
 
 # 2 단계 - 사용자 정의 사각형 그리기
-cv.namedWindow('image',flags=cv.WINDOW_NORMAL)
-cv.setMouseCallback('image', draw_rectangle)
+cv.namedWindow('hide on sticker',flags=cv.WINDOW_NORMAL)
+cv.setMouseCallback('hide on sticker', draw_rectangle)
 
 # 원본 이미지는 변함 없음을 보여줌
 while True:
-    cv.imshow('image', show_rectangle2(img, faces, stack))
+    cv.imshow('hide on sticker', show_rectangle2(img, faces, stack))
 
     key = cv.waitKey(1) & 0xFF
 
@@ -153,11 +151,11 @@ face_result = [(x, y, w, h) for (x, y, w, h) in faces] + stack
 # 삭제할 사각형 정보
 # 각 원소는 순서대로 x, y, w, h 
 
-print(len(face_result))
-print(face_result)
+#print(len(face_result))
+#print(face_result)
 
 # 3단계 - 선택한 영역에 블러처리 또는 스티커 붙이기
-cv.namedWindow('image',flags=cv.WINDOW_NORMAL)
+cv.namedWindow('hide on sticker',flags=cv.WINDOW_NORMAL)
 
 # 원본 이미지 해상도
 image_height, image_width = img.shape[:2]
@@ -244,7 +242,6 @@ def show_result(img, key):
         sticker = cv.imread(f'./sticker/{key - 49}.png', cv.IMREAD_UNCHANGED)
         return put_sticker(img=img, sticker=sticker)
     elif key == 57:
-        sticker = cv.imread(path_s + f'/{r.randint(1, sticker_len)}.png', cv.IMREAD_UNCHANGED)
         return put_sticker(img=img, rand=True)
 
     #elif key == 57: 
@@ -264,16 +261,20 @@ path_r = './result/'
 files = os.listdir(path_r)
 result_list = [file for file in files if file.endswith('.png')]
 
-print(result_list)
-
 if result_list:
     result_index = len(result_list) + 1
 else:
     result_index = 1
+
+temp_saved = None
     
 while True:
-    temp = show_result(img, key_index)
-    cv.imshow('image', temp)
+    if not temp_saved is None:
+        cv.imshow('hide on sticker', temp_saved)
+        temp_saved = None
+    else:
+        temp = show_result(img, key_index)
+        cv.imshow('hide on sticker', temp)
 
     key = cv.waitKey(0) & 0xFF
 
@@ -286,6 +287,7 @@ while True:
     elif key in (115, 83): # s키, S키 : 편집한 이미지 저장
         cv.imwrite(path_r  + str(result_index).zfill(3) + '.png', temp)
         result_index += 1
+        temp_saved = temp
     elif key == 27:
         exit(0)
 
