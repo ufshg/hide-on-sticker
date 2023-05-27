@@ -43,7 +43,7 @@ def click_rectangle(event, x, y, flags, param):
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
 
 # 이미지 불러오기
-img = cv.imread("sample.png")
+img = cv.imread("sample1.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 faces = face_cascade.detectMultiScale(gray, 1.03, 5)
 
@@ -165,6 +165,7 @@ image_height, image_width = img.shape[:2]
 mosaic_ratio = 0.05  # 모자이크 비율 (0.01 ~ 0.05 사이의 값을 사용)
 mosaic_size = int(min(image_height, image_width) * mosaic_ratio)
 
+# 모자이크 처리 함수
 def make_mosaic(img):
     temp = img.copy()
     for (x, y, w, h) in face_result:
@@ -182,13 +183,45 @@ def make_mosaic(img):
         temp[y:y+h, x:x+w] = mosaic
     return temp
 
+def put_sticker(img, sticker):
+    temp = img.copy()
+    for (x, y, w, h) in face_result:
+        
+        # 얼굴 인식된 영역 크기에 맞게 스티커 크기 조절
+        resized_sticker = cv.resize(sticker, (w, h))
+
+        overlay_alpha = resized_sticker[:, :, 3]
+        alpha = resized_sticker[:, :, 3]
+        alpha = np.expand_dims(alpha, axis=-1)
+        # 배경 이미지에서 얼굴 인식된 영역에 대응하는 부분 추출
+        #roi = temp[y:y+h, x:x+w]
+    
+        # 알파 채널을 이용하여 PNG 이미지를 오버레이
+        #overlay = cv.bitwise_and(resized_sticker[:, :, :3], resized_sticker[:, :, :3], mask=overlay_alpha)
+        result = (overlay_alpha.astype(float) * alpha) + (temp[y:y+h, x:x+w].astype(float) * (1-alpha))
+        result = result.astype(np.uint8)
+
+        # 오버레이 이미지와 배경 이미지 합성
+        #result = cv.add(overlay, roi)
+
+        # 합성된 이미지를 배경 이미지에 삽입
+        temp[y:y+h, x:x+w] = result
+        #temp[y:y+h, x:x+w] = overlay_alpha * resized_sticker[:, :, :3] + background_alpha * temp[y:y+h, x:x+w]
+
+        # 스티커를 기존 이미지에 덧붙이기
+        #temp[y:y+h, x:x+w] = resized_sticker
+    return temp
+
 def show_result(img, key):
     if key == 48:
         return img
     elif key == 49:
         return make_mosaic(img)
+    elif key == 50:
+        sticker = cv.imread('./sticker/1.png', cv.IMREAD_UNCHANGED)
+        return put_sticker(img, sticker)
     
-key = 48
+key = 49
     
 while True:
     cv.imshow('image',show_result(img, key))
