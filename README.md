@@ -52,6 +52,7 @@ pip install numpy
     - **[sticker](https://github.com/ufshg/hide-on-sticker/tree/main/sticker)** 폴더 안에 원하는 png 이미지를 넣어 적용할 스티커로 사용할 수 있습니다.
     - 1.png 부터 7.png 까지의 스티커는 숫자키 `2`~`8` 로 선택하여 일괄 적용이 가능합니다.
     - 저장한 파일은 **[result](https://github.com/ufshg/hide-on-sticker/tree/main/result)** 폴더에서 확인할 수 있습니다.
+    
       | 키         | 기능     | 
       | ------------ | -------- | 
       | 숫자키 `0` | 원본으로 되돌리기 | 
