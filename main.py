@@ -43,7 +43,7 @@ def click_rectangle(event, x, y, flags, param):
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
 
 # 이미지 불러오기
-img = cv.imread("sample4.png")
+img = cv.imread("sample.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 faces = face_cascade.detectMultiScale(gray, 1.03, 5)
 
@@ -166,33 +166,40 @@ mosaic_ratio = 0.05  # 모자이크 비율 (0.01 ~ 0.05 사이의 값을 사용)
 mosaic_size = int(min(image_height, image_width) * mosaic_ratio)
 
 def make_mosaic(img):
+    temp = img.copy()
     for (x, y, w, h) in face_result:
          # 모자이크 크기 계산
         face_mosaic_size = int(min(w, h) * mosaic_ratio)
 
         # 선택된 영역 추출
-        face_roi = img[y:y+h, x:x+w]
+        face_roi = temp[y:y+h, x:x+w]
 
         # 선택 영역 모자이크 처리
         mosaic = cv.resize(face_roi, (face_mosaic_size, face_mosaic_size), interpolation=cv.INTER_NEAREST)
         mosaic = cv.resize(mosaic, (w, h), interpolation=cv.INTER_NEAREST)
         
         # 원본 이미지에 모자이크 적용
-        img[y:y+h, x:x+w] = mosaic
-    return img
+        temp[y:y+h, x:x+w] = mosaic
+    return temp
 
-img = make_mosaic(img)
-
+def show_result(img, key):
+    if key == 48:
+        return img
+    elif key == 49:
+        return make_mosaic(img)
+    
+key = 48
+    
 while True:
-    cv.imshow('image',img)
+    cv.imshow('image',show_result(img, key))
 
-    key = cv.waitKey(1) & 0xFF
+    key = cv.waitKey(0) & 0xFF
 
     if key == 13: # s키, S키 : 편집한 이미지 저장
         cv.imwrite('edited'  + '.png',img)
         break
     elif key == 49:
-        exit(0)
+        pass
     elif key == 50:
         pass
     elif key == 51:
