@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import math
 
 # 마우스 이벤트에 사용할 변수
 click = False
@@ -22,14 +23,6 @@ def show_rectangle1(img, faces):
             cv.rectangle(temp, (x, y), (x + w, y + h), (255, 0, 0), 2)
     return temp
 
-# 1단계 이후 직사각형을 보여줌
-def show_rectangle2(img, faces):
-    temp = img.copy()
-    for x, y, w, h in faces:
-        cv.rectangle(temp, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-    return temp
-
 # 1 단계에서 사각형을 클릭했을 때 처리하는 함수
 def click_rectangle(event, x, y, flags, param):
     global x1, y1, click
@@ -45,18 +38,6 @@ def click_rectangle(event, x, y, flags, param):
         for a, b, w, h in check:
             if a <= x1 <= a + w and b <= y1 <= b + h:
                 check[(a, b, w, h)] ^= True
-
-
-def draw_rectangle(event, x, y, flags, param):
-    global x1, y1, click
-
-    if event == cv.EVENT_LBUTTONDOWN:
-        click = True
-        x1, y1 = x, y
-    elif event == cv.EVENT_LBUTTONUP:
-        click = False
-        cv.rectangle(temp, (x1, y1), (x, y), (0, 0, 255), 2)
-            
 
 # 얼굴 검출기 초기화
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
@@ -104,15 +85,46 @@ while task:
     faces = np.delete(faces, i, axis=0)
 
 ######################################################
+
+# 1단계 이후 직사각형을 보여줌
+def show_rectangle2(img, faces, stack):
+    temp = img.copy()
+    for x, y, w, h in faces:
+        cv.rectangle(temp, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    
+    for x, y, w, h in stack:
+        cv.rectangle(temp, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+    return temp
+
+def draw_rectangle(event, x, y, flags, param):
+    global x1, y1, click, faces, stack
+
+    if event == cv.EVENT_LBUTTONDOWN:
+        click = True
+        x1, y1 = x, y
+    elif event == cv.EVENT_LBUTTONUP:
+        click = False
+        if math.hypot(x - x1, y - y1) > 10:
+            print(math.hypot(x1 - x, y1 - y))
+            # 좌표 데이터 빌드
+            box = (min(x1, x), min(y1, y), abs(x1 - x), abs(y1 - y))
+            stack.append(box)
+    elif event == cv.EVENT_RBUTTONDOWN:
+        print('hi')
+        if stack:
+            print(stack)
+            stack.pop()
+
+stack = []
+
 # 2 단계 - 사용자 정의 사각형 그리기
 cv.namedWindow('image')
 cv.setMouseCallback('image', draw_rectangle)
 
-temp = show_rectangle2(img, faces)
-
 # 원본 이미지는 변함 없음을 보여줌
 while True:
-    cv.imshow('image', temp)
+    cv.imshow('image', show_rectangle2(img, faces, stack))
 
     key = cv.waitKey(1) & 0xFF
 
@@ -121,3 +133,12 @@ while True:
 
 cv.destroyAllWindows()
 
+face_result = [(x, y, w, h) for (x, y, w, h) in faces] + stack
+
+######################################################
+
+# 삭제할 사각형 정보
+# 각 원소는 순서대로 x, y, w, h 
+
+print(len(face_result))
+print(face_result)
