@@ -33,13 +33,13 @@ pip install numpy
 - 환경이 준비되었다면, **[resource](https://github.com/ufshg/hide-on-sticker/tree/main/resource)** 폴더 안에 원하는 이미지를 넣습니다. **(파일명 - resource.png)**
 - 프로그램 조작법은 아래와 같습니다. (모든 작업 단계에서 esc키를 눌러 즉시 프로그램을 종료할 수 있습니다.)
 
-  ### [1단계](#step1) - 가리고 싶지 않은 얼굴 제외
+  ### [1단계](#step1) - 가리고 싶지 않은 얼굴 제외 <a id="back1"></a>
     - 원하는 이미지를 넣고 프로그램을 실행하면 얼굴로 인식된 영역에 **빨간 박스**가 그려져있습니다.
     
     - 가리고싶지 않은 얼굴 영역을 클릭하면 **파란 박스**로 바뀌며, 처리 대상에서 제외됩니다. (파란 박스를 다시 클릭하여 처리 대상에 포함시킬 수 있습니다.)
     
     - 제외할 영역을 모두 선택했다면 `Enter`키를 눌러 다음 단계를 진행합니다.
-  ### [2단계](#step2) - 처리가 필요한 영역 추가 선택
+  ### [2단계](#step2) - 처리가 필요한 영역 추가 선택 <a id="back2"></a>
     - 얼굴 인식이 제대로 되지 않았거나 추가로 가리고 싶은 영역을 직접 선택할 수 있습니다.
     
     - 마우스로 드래그하여 원하는 영역에 적절한 크기의 사각형을 그립니다.
@@ -47,7 +47,7 @@ pip install numpy
     - 잘못 그려진 사각형은 마우스 우클릭으로 취소할 수 있습니다. (가장 최근에 그려진 사각형부터 취소됩니다.)
     
     - 영역 선택 완료 후 `Enter`키를 눌러 다음 단계로 넘어갑니다.
-  ### [3단계](#step3) - 선택한 영역 가림 처리
+  ### [3단계](#step3) - 선택한 영역 가림 처리 <a id="back3"></a>
     - 키보드 조작으로 사용자가 선택한 영역에 대하여 가림 처리를 진행합니다.
     - **[sticker](https://github.com/ufshg/hide-on-sticker/tree/main/sticker)** 폴더 안에 원하는 png 이미지를 넣어 적용할 스티커로 사용할 수 있습니다.
     - 1.png 부터 7.png 까지의 스티커는 숫자키 `2`~`8` 로 선택하여 일괄 적용이 가능합니다.
@@ -65,7 +65,7 @@ pip install numpy
 
 ## 프로젝트 실행 결과 예시
 
-  ### [1단계] - 가리고 싶지 않은 얼굴 제외 <a id="step1"></a>
+  ### [1단계](#back1) - 가리고 싶지 않은 얼굴 제외 <a id="step1"></a>
   
   - 얼굴이 인식된 영역 표시
   <img src="https://github.com/ufshg/hide-on-sticker/assets/81071456/15118e92-c1c1-4d4d-8680-af283ab3604c" width="620" height="420"/>
@@ -81,7 +81,7 @@ pip install numpy
   <br/>
   <br/>
     
-  ### [2단계] - 처리가 필요한 영역 추가 선택 <a id="step2"></a>
+  ### [2단계](#back2) - 처리가 필요한 영역 추가 선택 <a id="step2"></a>
   
   - 추가로 처리하고 싶은 영역 선택 (각각 추가 선택 O, X의 경우)
   <img src="https://github.com/ufshg/hide-on-sticker/assets/81071456/45a05280-8c74-4159-b787-445f47b1c210" width="620" height="420"/>
@@ -90,7 +90,7 @@ pip install numpy
   <br/>
   <br/>
     
-  ### [3단계] - 선택한 영역 가림 처리 <a id="step3"></a>
+  ### [3단계](#back3) - 선택한 영역 가림 처리 <a id="step3"></a>
   
   - 모자이크 처리
   <img src="https://github.com/ufshg/hide-on-sticker/assets/81071456/46f0fad9-0593-4bda-8a47-1e889888b07e" width="620" height="420"/>
