@@ -103,11 +103,19 @@ pip install numpy
   <img src="https://github.com/ufshg/hide-on-sticker/assets/81071456/d88cb45a-8a41-41c2-ae06-6bad41dd99dd" width="620" height="420"/>
   <img src="https://github.com/ufshg/hide-on-sticker/assets/81071456/0b4c5d79-adac-4fc4-8f27-80422526275b" width="620" height="420"/>
   
+  
+  #### [프로젝트 데모 영상](https://www.youtube.com/watch?v=BDetAVbNI70)
 
 ## 참조
 
-- 추가 예정
+프로젝트를 개발하면서 코드 일부 인용 및 참고한 사이트 목록 입니다.
 
+- [[Practice]스노우 앱처럼 얼굴에 스티커 붙이기](https://hazel-developer.tistory.com/103)
 ```
-  - 추가 예정
+png 파일을 스티커처럼 선택 영역 위에 덮어씌우는 코드 일부 인용
 ```
+- [[OpenCV] Python으로 Mouse Event, 드래그로 사각형 그리기](https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=rhrkdfus&logNo=221612919440)
+```
+드래그 Mouse Event로 선택하고 싶은 영역 위에 사각형을 그리는 코드 참고
+```
+- 그 외 도움 - [chatGPT](https://openai.com/blog/chatgpt)
