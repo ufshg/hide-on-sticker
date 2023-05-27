@@ -30,15 +30,14 @@ def click_rectangle(event, x, y, flags, param):
 
     if event == cv.EVENT_LBUTTONDOWN:
         click = True
-        x1, y1 = x, y
     elif event == cv.EVENT_LBUTTONUP:
-        click = False
-        x1, y1 = x, y
+        if click:
+            click = False
 
-        # x, y, w, h 인데 변수명이 겹침
-        for a, b, w, h in check:
-            if a <= x1 <= a + w and b <= y1 <= b + h:
-                check[(a, b, w, h)] ^= True
+            # x, y, w, h 인데 변수명이 겹침
+            for a, b, w, h in check:
+                if a <= x <= a + w and b <= y <= b + h:
+                    check[(a, b, w, h)] ^= True
 
 # 얼굴 검출기 초기화
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
@@ -112,9 +111,7 @@ def draw_rectangle(event, x, y, flags, param):
         stack.append(box)
     elif event == cv.EVENT_MOUSEMOVE:
         if click:
-            stack.pop()
-            box = Box(x, y, x1, y1)
-            stack.append(box)
+            stack[-1] = Box(x, y, x1, y1)
     elif event == cv.EVENT_LBUTTONUP:
         click = False
         stack.pop()
@@ -160,8 +157,11 @@ cv.namedWindow('hide on sticker',flags=cv.WINDOW_NORMAL)
 # 원본 이미지 해상도
 image_height, image_width = img.shape[:2]
 
+# 이미지 해상도에 따라 가변 비율 적용
+threshold = (min(image_height, image_width) // 100) * 0.01
+
 # 모자이크 크기 계산
-mosaic_ratio = 0.08  # 모자이크 비율 (0.01 ~ 0.05 사이의 값을 사용)
+mosaic_ratio = max(0.025, 0.15 - threshold)  # 모자이크 비율 (0.01 ~ 0.05 사이의 값을 사용)
 mosaic_size = int(min(image_height, image_width) * mosaic_ratio)
 
 # 모자이크 처리 함수
