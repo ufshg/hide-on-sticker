@@ -43,7 +43,7 @@ def click_rectangle(event, x, y, flags, param):
 face_cascade = cv.CascadeClassifier(cv.data.haarcascades + "haarcascade_frontalface_alt.xml")
 
 # 이미지 불러오기
-img = cv.imread("sample1.png")
+img = cv.imread("sample4.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 faces = face_cascade.detectMultiScale(gray, 1.03, 5)
 
@@ -54,7 +54,7 @@ for x, y, w, h in faces:
 
 ######################################################
 # 1 단계 - 검출된 얼굴 중 지울 것들을 선택
-cv.namedWindow('image')
+cv.namedWindow('image',flags=cv.WINDOW_NORMAL)
 cv.setMouseCallback('image', click_rectangle)
 
 while True:
@@ -62,9 +62,10 @@ while True:
 
     key = cv.waitKey(1) & 0xFF
 
-    if key == 27:
+    if key == 13:
         break
-
+    elif key == 27:
+        exit(0)
 cv.destroyAllWindows()
 
 # 선택하지 않은 얼굴 제거
@@ -128,7 +129,7 @@ def draw_rectangle(event, x, y, flags, param):
 stack = []
 
 # 2 단계 - 사용자 정의 사각형 그리기
-cv.namedWindow('image')
+cv.namedWindow('image',flags=cv.WINDOW_NORMAL)
 cv.setMouseCallback('image', draw_rectangle)
 
 # 원본 이미지는 변함 없음을 보여줌
@@ -137,8 +138,10 @@ while True:
 
     key = cv.waitKey(1) & 0xFF
 
-    if key == 27:
+    if key == 13:
         break
+    elif key == 27:
+        exit(0)
 
 cv.destroyAllWindows()
 
@@ -151,3 +154,59 @@ face_result = [(x, y, w, h) for (x, y, w, h) in faces] + stack
 
 print(len(face_result))
 print(face_result)
+
+# 3단계 - 선택한 영역에 블러처리 또는 스티커 붙이기
+cv.namedWindow('image',flags=cv.WINDOW_NORMAL)
+
+# 원본 이미지 해상도
+image_height, image_width = img.shape[:2]
+
+# 모자이크 크기 계산
+mosaic_ratio = 0.05  # 모자이크 비율 (0.01 ~ 0.05 사이의 값을 사용)
+mosaic_size = int(min(image_height, image_width) * mosaic_ratio)
+
+def make_mosaic(img):
+    for (x, y, w, h) in face_result:
+         # 모자이크 크기 계산
+        face_mosaic_size = int(min(w, h) * mosaic_ratio)
+
+        # 선택된 영역 추출
+        face_roi = img[y:y+h, x:x+w]
+
+        # 선택 영역 모자이크 처리
+        mosaic = cv.resize(face_roi, (face_mosaic_size, face_mosaic_size), interpolation=cv.INTER_NEAREST)
+        mosaic = cv.resize(mosaic, (w, h), interpolation=cv.INTER_NEAREST)
+        
+        # 원본 이미지에 모자이크 적용
+        img[y:y+h, x:x+w] = mosaic
+    return img
+
+img = make_mosaic(img)
+
+while True:
+    cv.imshow('image',img)
+
+    key = cv.waitKey(1) & 0xFF
+
+    if key == 13: # s키, S키 : 편집한 이미지 저장
+        cv.imwrite('edited'  + '.png',img)
+        break
+    elif key == 49:
+        exit(0)
+    elif key == 50:
+        pass
+    elif key == 51:
+        pass
+    elif key == 52:
+        pass
+    elif key == 53:
+        pass
+    elif key == 54:
+        pass
+    elif key in (115, 83): # s키, S키 : 편집한 이미지 저장
+        cv.imwrite('edited'  + '.png',img)
+        break
+    elif key == 27:
+        exit(0)
+
+cv.destroyAllWindows()
