@@ -97,19 +97,28 @@ def show_rectangle2(img, faces, stack):
 
     return temp
 
+def Box(x, y, x1, y1):
+    return min(x, x1), min(y, y1), abs(x - x1), abs(y - y1)
+
 def draw_rectangle(event, x, y, flags, param):
     global x1, y1, click, faces, stack
 
     if event == cv.EVENT_LBUTTONDOWN:
         click = True
         x1, y1 = x, y
+        box = Box(x, y, x1, y1)
+        stack.append(box)
+    elif event == cv.EVENT_MOUSEMOVE:
+        if click:
+            stack.pop()
+            box = Box(x, y, x1, y1)
+            stack.append(box)
     elif event == cv.EVENT_LBUTTONUP:
         click = False
-        if math.hypot(x - x1, y - y1) > 10:
-            print(math.hypot(x1 - x, y1 - y))
-            # 좌표 데이터 빌드
-            box = (min(x1, x), min(y1, y), abs(x1 - x), abs(y1 - y))
-            stack.append(box)
+        stack.pop()
+        box = Box(x, y, x1, y1)
+        stack.append(box)
+        
     elif event == cv.EVENT_RBUTTONDOWN:
         print('hi')
         if stack:
